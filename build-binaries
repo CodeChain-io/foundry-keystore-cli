@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+
+const { execSync } = require("child_process");
+const { version } = require("./package.json");
+
+try {
+    execSync("rm -r binaries/");
+} catch (err) {
+    // ignore
+}
+
+execSync("yarn pkg -t node12-linux-x64,node12-macos-x64,node12-win-x64 --out-path binaries/ package.json");
+console.log("Build done");
+
+const files = [
+    "codechain-keystore-cli-linux",
+    "codechain-keystore-cli-macos",
+    "codechain-keystore-cli-win.exe"
+];
+
+process.chdir("binaries");
+for (const file of files) {
+    const distFile = getDistFile(file);
+    execSync(`mv ${file} ${distFile}`);
+    const dir = removeExe(file);
+    execSync(`mkdir -p ${dir}`);
+    execSync(`mv ${distFile} ${dir}/`);
+
+    execSync(`zip -r ${dir}-${version}.zip ${dir}`);
+}
+
+/**
+ * @param {string} fileName
+ */
+function removeExe(fileName) {
+    if (fileName.indexOf("exe") !== -1) {
+        return fileName.slice(0, fileName.length - 4);
+    } else {
+        return fileName;
+    }
+}
+
+function getDistFile(fileName) {
+    if (fileName.indexOf("exe") !== -1) {
+        return "cckey.exe";
+    } else {
+        return "cckey";
+    }
+}
