@@ -1,10 +1,8 @@
-import { CCKey } from "codechain-keystore";
+import { CCKey } from "foundry-keystore";
 
-export type AccountType = "platform" | "asset";
 export type Action = "list" | "create" | "delete";
 
 export interface CommonOption {
-    accountType: string;
     keysPath: string;
     networkId: string;
 }
@@ -37,6 +35,5 @@ export interface ExportOption {
 
 export interface Context {
     cckey: CCKey;
-    accountType: AccountType;
     networkId: string;
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { CCKey } from "codechain-keystore";
-import { AssetAddress, PlatformAddress } from "codechain-primitives";
 import * as program from "commander";
 import { prompt } from "enquirer";
+import { CCKey } from "foundry-keystore";
+import { Address } from "foundry-primitives";
 import * as fs from "fs";
 import * as _ from "lodash";
 import * as process from "process";
@@ -16,7 +16,6 @@ import { importRawKey } from "./command/importRaw";
 import { listKeys } from "./command/list";
 import { CLIError, CLIErrorType } from "./error";
 import {
-    AccountType,
     CreateOption,
     DeleteOption,
     ExportOption,
@@ -25,17 +24,12 @@ import {
 } from "./types";
 import { getAddressFromKey } from "./util";
 
-const VERSION = "0.8.2";
+const VERSION = "0.1.0";
 
 const DEFAULT_KEYS_PATH = "keystore.db";
 
 program
     .version(VERSION)
-    .option(
-        "-t, --account-type <accountType>",
-        "'platform' or 'asset'. The type of the key",
-        "platform"
-    )
     .option(
         "--keys-path <keysPath>",
         "the path to store the keys",
@@ -72,7 +66,7 @@ program
 
 program
     .command("import-raw <privateKey>")
-    .description("import a raw private key (32 byte hexadecimal string)")
+    .description("import a raw private key 64 byte hexadecimal string)")
     .option("-p, --passphrase <passphrase>", "passphrase")
     .action(handleError(importRawCommand));
 
@@ -109,24 +103,20 @@ function handleError(
 
 async function listCommand(args: any[], option: ListOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const networkId = option.parent.networkId;
     await listKeys({
         cckey,
-        accountType,
         networkId
     });
 }
 
 async function createCommand(args: any[], option: CreateOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const passphrase = await parsePassphrase(option.passphrase);
     const networkId = option.parent.networkId;
     await createKey(
         {
             cckey,
-            accountType,
             networkId
         },
         passphrase
@@ -135,16 +125,14 @@ async function createCommand(args: any[], option: CreateOption) {
 
 async function deleteCommand(args: any[], option: DeleteOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const networkId = option.parent.networkId;
     if (_.isUndefined(option.address) && process.stdout.isTTY) {
-        option.address = await selectAddress(cckey, networkId, accountType);
+        option.address = await selectAddress(cckey, networkId);
     }
-    const address = parseAddress(accountType, option.address);
+    const address = parseAddress(option.address);
     await deleteKey(
         {
             cckey,
-            accountType,
             networkId
         },
         address
@@ -153,14 +141,12 @@ async function deleteCommand(args: any[], option: DeleteOption) {
 
 async function importCommand([path]: any[], option: ImportOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const passphrase = await parsePassphrase(option.passphrase);
     const contents = fs.readFileSync(path, { encoding: "utf8" });
     const networkId = option.parent.networkId;
     await importKey(
         {
             cckey,
-            accountType,
             networkId
         },
         JSON.parse(contents),
@@ -170,13 +156,11 @@ async function importCommand([path]: any[], option: ImportOption) {
 
 async function importRawCommand([privateKey]: any[], option: ImportOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const passphrase = await parsePassphrase(option.passphrase);
     const networkId = option.parent.networkId;
     await importRawKey(
         {
             cckey,
-            accountType,
             networkId
         },
         privateKey,
@@ -186,17 +170,15 @@ async function importRawCommand([privateKey]: any[], option: ImportOption) {
 
 async function exportCommand(args: any[], option: ExportOption) {
     const cckey = await CCKey.create({ dbPath: option.parent.keysPath });
-    const accountType = parseAccountType(option.parent.accountType);
     const networkId = option.parent.networkId;
     if (_.isUndefined(option.address) && process.stdout.isTTY) {
-        option.address = await selectAddress(cckey, networkId, accountType);
+        option.address = await selectAddress(cckey, networkId);
     }
-    const address = parseAddress(accountType, option.address);
+    const address = parseAddress(option.address);
     const passphrase = await parsePassphrase(option.passphrase);
     const secret = await exportKey(
         {
             cckey,
-            accountType,
             networkId
         },
         address,
@@ -211,17 +193,17 @@ async function exportCommand(args: any[], option: ExportOption) {
 program.on("--help", () => {
     console.log(`  Examples:
 
-    cckey create -t platform --passphrase "my password"
+    cckey create --passphrase "my password"
 
-    cckey list -t asset
+    cckey list
 
-    cckey delete -t platform --address "ccc..."
+    cckey delete --address "ccc..."
 
-    cckey import UTC--2018-08-14T06-30-23Z--bbb6685e-7165-819d-0988-fc1a7d2d0523 -t platform --passphrase "satoshi"
+    cckey import UTC--2018-08-14T06-30-23Z--bbb6685e-7165-819d-0988-fc1a7d2d0523 --passphrase "satoshi"
 
-    cckey export -t platform --address cccq8ah0efv5ckpx6wy5mwva2aklzwsdw027sqfksrr --passphrase "satoshi"
+    cckey export --address cccqy6vhjxs8ddf6y6etgdqcs5elcrl6n6t0vdwumu8 --passphrase "satoshi"
 
-    cckey import-raw -t platform a05f81608217738d99da8fd227897b87e8890d3c9159b559c7c8bbd408e5fb6e --passphrase "satoshi"
+    cckey import-raw b71f1a9a5fb63155b7ccc12841867e95a33da91c305158045a6c7c5e575f204828adec3980387a12ef9f159721c853e47e64a37f61407e0131e9e62983cd6d2e --passphrase "satoshi"
 `);
 });
 
@@ -231,35 +213,13 @@ if (program.args.length === 0) {
     process.exit(1);
 }
 
-function parseAccountType(accountType: string): AccountType {
-    if (_.isUndefined(accountType)) {
-        throw new CLIError(CLIErrorType.OptionRequired, {
-            optionName: "account-type"
-        });
-    }
-    if (!_.includes(["platform", "asset"], accountType)) {
-        throw new CLIError(CLIErrorType.InvalidAccountType);
-    }
-    return accountType as AccountType;
-}
-
-function parseAddress(accountType: AccountType, address: string): string {
+function parseAddress(address: string): string {
     if (_.isUndefined(address)) {
         throw new CLIError(CLIErrorType.OptionRequired, {
             optionName: "address"
         });
     }
-    try {
-        if (accountType === "platform") {
-            PlatformAddress.fromString(address);
-        } else {
-            AssetAddress.fromString(address);
-        }
-    } catch (err) {
-        throw new CLIError(CLIErrorType.InvalidAddress, {
-            message: err.message
-        });
-    }
+    Address.fromString(address);
     return address;
 }
 
@@ -281,13 +241,9 @@ async function parsePassphrase(passphrase: string): Promise<string> {
     return answer.passphrase;
 }
 
-async function selectAddress(
-    cckey: CCKey,
-    networkId: string,
-    accountType: AccountType
-): Promise<string> {
-    let keys = await cckey[accountType].getKeys();
-    keys = _.map(keys, key => getAddressFromKey(accountType, key, networkId));
+async function selectAddress(cckey: CCKey, networkId: string): Promise<string> {
+    let keys = await cckey.keystore.getKeys();
+    keys = _.map(keys, key => getAddressFromKey(key, networkId));
     const question = {
         type: "select",
         name: "address",

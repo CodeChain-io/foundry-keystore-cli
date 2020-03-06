@@ -28,7 +28,6 @@ yarn global add foundry-keystore-cli
   Options:
 
     -V, --version                      output the version number
-    -t, --account-type <accountType>   'platform' or 'asset'. The type of the key (default: platform)
     --keys-path <keysPath>             the path to store the keys (default: keystore.db)
     --network-id <networkId>           the id of the network (use 'cc' for mainnet, use 'wc' for corgi) (default: cc)
     -h, --help                         output usage information
@@ -39,20 +38,20 @@ yarn global add foundry-keystore-cli
     create [options]                   create a new key
     delete [options]                   delete a key
     import [options] <path>            import a key
-    import-raw [options] <privateKey>  import a raw private key (32 byte hexadecimal string)
+    import-raw [options] <privateKey>  import a raw private key (64 byte hexadecimal string)
     export [options]                   export the key
 
   Examples:
 
-    cckey create -t platform --passphrase "my password"
+    cckey create --passphrase "passphrase1"
 
-    cckey list -t asset
+    cckey list
 
-    cckey delete -t platform --address "ccc..."
+    cckey delete --address cccqy6vhjxs8ddf6y6etgdqcs5elcrl6n6t0vdwumu8
 
-    cckey import UTC--2018-08-14T06-30-23Z--bbb6685e-7165-819d-0988-fc1a7d2d0523 -t platform --passphrase "satoshi"
+    cckey import UTC--2020-03-05T02-47-14Z--6adba8c6-04ff-f649-6347-5c7946e28733 --passphrase "passphrase2"
 
-    cckey export -t platform --address cccq8ah0efv5ckpx6wy5mwva2aklzwsdw027sqfksrr --passphrase "satoshi"
+    cckey export --address cccq8ah0efv5ckpx6wy5mwva2aklzwsdw027sqfksrr --passphrase "passphrase3"
 
-    cckey import-raw -t platform a05f81608217738d99da8fd227897b87e8890d3c9159b559c7c8bbd408e5fb6e --passphrase "satoshi"
+    cckey import-raw b71f1a9a5fb62155b7ccc12841867e95a33da91c30515804546c7c5e575f2048287dec3980387a12ef9f159721c853e47e64a37f61407e0231ee62983cd6d2e --passphrase "passphrase4"
 ```

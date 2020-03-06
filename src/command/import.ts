@@ -1,17 +1,17 @@
-import { SecretStorage } from "codechain-keystore";
+import { SecretStorage } from "foundry-keystore";
 
 import { Context } from "../types";
 import { getAddressFromKey } from "../util";
 
 export async function importKey(
-    { cckey, accountType, networkId }: Context,
+    { cckey, networkId }: Context,
     secret: SecretStorage,
     passphrase: string
 ): Promise<void> {
-    const key = await cckey[accountType].importKey({
+    const key = await cckey.keystore.importKey({
         secret,
         passphrase
     });
 
-    console.log(getAddressFromKey(accountType, key, networkId));
+    console.log(getAddressFromKey(key, networkId));
 }

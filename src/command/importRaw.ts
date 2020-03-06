@@ -1,17 +1,17 @@
-import { PrivateKey } from "codechain-keystore/lib/types";
+import { PrivateKey } from "foundry-keystore/lib/types";
 
 import { Context } from "../types";
 import { getAddressFromKey } from "../util";
 
 export async function importRawKey(
-    { cckey, accountType, networkId }: Context,
+    { cckey, networkId }: Context,
     privateKey: PrivateKey,
     passphrase: string
 ): Promise<void> {
-    const key = await cckey[accountType].importRaw({
+    const key = await cckey.keystore.importRaw({
         privateKey,
         passphrase
     });
 
-    console.log(getAddressFromKey(accountType, key, networkId));
+    console.log(getAddressFromKey(key, networkId));
 }
