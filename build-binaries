@@ -13,9 +13,9 @@ execSync("yarn pkg -t node12-linux-x64,node12-macos-x64,node12-win-x64 --out-pat
 console.log("Build done");
 
 const files = [
-    "codechain-keystore-cli-linux",
-    "codechain-keystore-cli-macos",
-    "codechain-keystore-cli-win.exe"
+    "foundry-keystore-cli-linux",
+    "foundry-keystore-cli-macos",
+    "foundry-keystore-cli-win.exe"
 ];
 
 process.chdir("binaries");

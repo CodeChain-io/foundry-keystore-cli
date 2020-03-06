@@ -5,11 +5,11 @@ import { Context } from "../types";
 import { findMatchingKey } from "../util";
 
 export async function deleteKey(
-    { cckey, accountType, networkId }: Context,
+    { cckey, networkId }: Context,
     address: string
 ): Promise<void> {
-    const keys = await cckey[accountType].getKeys();
-    const key = findMatchingKey(accountType, keys, address, networkId);
+    const keys = await cckey.keystore.getKeys();
+    const key = findMatchingKey(keys, address, networkId);
 
     const question = {
         type: "confirm",
@@ -19,7 +19,7 @@ export async function deleteKey(
 
     const answer: any = await prompt(question);
     if (answer.delete) {
-        const result = await cckey[accountType].deleteKey({ key });
+        const result = await cckey.keystore.deleteKey({ key });
         if (!result) {
             throw new CLIError(CLIErrorType.Unknown, {
                 message: "Delete failed"

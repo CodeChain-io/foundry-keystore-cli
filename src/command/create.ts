@@ -2,12 +2,12 @@ import { Context } from "../types";
 import { getAddressFromKey } from "../util";
 
 export async function createKey(
-    { cckey, accountType, networkId }: Context,
+    { cckey, networkId }: Context,
     passphrase: string
 ): Promise<void> {
-    const key = await cckey[accountType].createKey({
+    const key = await cckey.keystore.createKey({
         passphrase
     });
 
-    console.log(getAddressFromKey(accountType, key, networkId));
+    console.log(getAddressFromKey(key, networkId));
 }

@@ -1,7 +1,6 @@
 import { Action } from "./types";
 
 export enum CLIErrorType {
-    InvalidAccountType,
     InvalidAction,
     InvalidAddress,
     OptionRequired,
@@ -19,8 +18,6 @@ function getErrorMessage(type: CLIErrorType, args: any = {}) {
     const actions: Action[] = ["list", "create", "delete"];
 
     switch (type) {
-        case CLIErrorType.InvalidAccountType:
-            return "Account-type should be 'platform' or 'asset'";
         case CLIErrorType.InvalidAction:
             return `Action should one of the ${JSON.stringify(actions)}`;
         case CLIErrorType.InvalidAddress:
