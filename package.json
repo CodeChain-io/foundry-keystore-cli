@@ -1,6 +1,6 @@
 {
   "name": "foundry-keystore-cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A cli tool which manages Foundry accounts",
   "main": "build/index.js",
   "bin": {
