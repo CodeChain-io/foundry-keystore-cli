@@ -6,7 +6,7 @@ A command line for Foundry's key management tool
 
 ### Binary install
 
-You can download the latest binaries from [here](https://github.com/CodeChain-io/foundry-keystore-cli/releases/tag/0.1.1)
+You can download the latest binaries from [here](https://github.com/CodeChain-io/foundry-keystore-cli/releases/tag/0.1.0)
 
 ### Install using the npm package manager
 
